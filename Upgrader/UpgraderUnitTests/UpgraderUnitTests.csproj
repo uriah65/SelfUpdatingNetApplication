@@ -50,8 +50,16 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="FakeOperations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="U_Controller_MainApp.cs" />
+    <Compile Include="U_Controller_Updater.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Upgrader.csproj">
+      <Project>{db31ed86-bedd-4dc8-8916-d0f075f1b177}</Project>
+      <Name>Upgrader</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
