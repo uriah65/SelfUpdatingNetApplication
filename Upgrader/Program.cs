@@ -2,8 +2,6 @@
 
 namespace Upgrader
 {
-    //todo: better msg if upgrader requires main app to start ...
-
     public class Program
     {
         internal static IUpdateOperations _operations = new Operations(); // to do as factory injection
@@ -14,6 +12,12 @@ namespace Upgrader
             {
                 Constants.LoadConfiguration();
                 Main_Inner();
+            }
+            catch (UpgradeUpgraderException ex)
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine($"{ex.Message}");
+                Console.ReadKey();
             }
             catch (Exception ex)
             {
@@ -46,7 +50,7 @@ namespace Upgrader
                 *  We recommend user to start main application as if should be in the first place.
                 */
                 Constants.Tracer.Trace("Main inner: Exception Upgrader Update required.");
-                throw new UpgradeException(Constants.MESSAGE_START_MAINAPP);
+                throw new UpgradeUpgraderException($"Please start main application '{Constants.ApplicationExe}'.", null);// UpgradeException(Constants.MESSAGE_START_MAINAPP);
             }
 
             /* if Updater itself is up to date, we can check main application, update it if required,
@@ -95,7 +99,7 @@ namespace Upgrader
                     *  Even it is so, we report an error, and user can start main application, so that new version of Updater can be updated.
                     */
                     Constants.Tracer.Trace("IsApplicationRestart_Inner: Exception Launch by Upgrader.");
-                    throw new UpgradeException(Constants.MESSAGE_START_MAINAPP); //todo: custom exception
+                    throw new UpgradeException(Constants.MESSAGE_CANNOT_COMPLETE_UPDATE, null); //todo: custom exception
                 }
 
                 /* Here we know that the main application has been started first.
@@ -119,7 +123,7 @@ namespace Upgrader
                     *  In both these case re-lunch is reasonable.
                     */
                     Constants.Tracer.Trace("IsApplicationRestart_Inner: Exception Launch by upgrader 2.");
-                    throw new UpgradeException(Constants.MESSAGE_CANNOT_COMPLETE_UPDATE);
+                    throw new UpgradeException(Constants.MESSAGE_CANNOT_COMPLETE_UPDATE, null);
                 }
 
                 /* We are in the process of the main application. New version has been discovered.

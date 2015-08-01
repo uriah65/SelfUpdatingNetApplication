@@ -57,7 +57,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Tracer.cs" />
-    <Compile Include="UpgradeException.cs" />
+    <Compile Include="UpgraderExceptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

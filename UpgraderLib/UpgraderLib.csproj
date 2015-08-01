@@ -58,8 +58,8 @@
     <Compile Include="..\Upgrader\Tracer.cs">
       <Link>Tracer.cs</Link>
     </Compile>
-    <Compile Include="..\Upgrader\UpgradeException.cs">
-      <Link>UpgradeException.cs</Link>
+    <Compile Include="..\Upgrader\UpgraderExceptions.cs">
+      <Link>UpgraderExceptions.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

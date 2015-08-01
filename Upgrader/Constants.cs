@@ -12,7 +12,7 @@ namespace Upgrader
         public static string UPGRADER_EXE_FILE = "Upgrader.exe";
         public static string UPGRADER_CONFIGURATION_FILE = UPGRADER_EXE_FILE + ".config";
 
-        public static readonly string MESSAGE_START_MAINAPP = $"{UPGRADER_EXE_FILE} is out of date, please start main application.";
+        //public static readonly string MESSAGE_START_MAINAPP = $"{UPGRADER_EXE_FILE} is out of date, please start main application.";
         public static readonly string MESSAGE_CANNOT_COMPLETE_UPDATE = $"Cannot complete update of the main application. Please restart application.";
 
         internal static string WorkingDirectory { get; private set; }
@@ -32,28 +32,28 @@ namespace Upgrader
             XElement xdoc = XElement.Load(WorkingDirectory + UPGRADER_CONFIGURATION_FILE);
             var els = xdoc.Descendants("setting");
 
-            /* get values */
+            /* getting values */
             ApplicationExe = els.SingleOrDefault(e => e.Attribute("name").Value == "ApplicationExe")?.Value;
             InstallationDirectory = els.SingleOrDefault(e => e.Attribute("name").Value == "InstallationDirectory")?.Value;
             var allowOfflineStr = els.SingleOrDefault(e => e.Attribute("name").Value == "AllowOffLine")?.Value;
-            AllowOffline = string.Compare(allowOfflineStr, "true", true) == 0; //todo: test reading settings
+            AllowOffline = string.Compare(allowOfflineStr, "true", true) == 0; 
 
             /* verify values */
             if (string.IsNullOrWhiteSpace(ApplicationExe))
             {
-                throw new UpgradeException("Please specify 'ApplicationExe' parameter in the Upgrader.exe.config file.");
+                throw new UpgradeException("Please specify 'ApplicationExe' parameter in the Upgrader.exe.config file.", null);
             }
 
             if (string.IsNullOrWhiteSpace(InstallationDirectory))
             {
-                throw new UpgradeException("Please specify 'InstallationDirectory' setting in the Upgrader.exe.config file.");
+                throw new UpgradeException("Please specify 'InstallationDirectory' setting in the Upgrader.exe.config file.", null);
             }
 
             if (Directory.Exists(InstallationDirectory) == false)
             {
                 if (AllowOffline == false)
                 {
-                    throw new UpgradeException("InstallationDirectory directory isn't available.");
+                    throw new UpgradeException("InstallationDirectory directory isn't available.", null);
                 }
             }
 

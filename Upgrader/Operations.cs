@@ -56,7 +56,7 @@ namespace Upgrader
             file = Constants.WorkingDirectory + file;
             if (File.Exists(file) == false)
             {
-                throw new UpgradeException($"File {file} wasn't found.");
+                throw new UpgradeException($"File {file} wasn't found.", null);
             }
 
             Process process = new Process();
@@ -91,7 +91,7 @@ namespace Upgrader
 
             if (files == null)
             {
-                throw new UpgradeException($"Application installation directory '{Constants.InstallationDirectory}' is empty.");
+                throw new UpgradeException($"Application installation directory '{Constants.InstallationDirectory}' is empty.", null);
             }
 
             if (exceptUpgrader)
@@ -113,7 +113,7 @@ namespace Upgrader
                     message += locked[i] + ", ";
                 }
 
-                throw new UpgradeException(message);
+                throw new UpgradeException(message, null);
             }
 
             CopyNewerFiles(Constants.InstallationDirectory, Constants.WorkingDirectory, files);
@@ -134,7 +134,7 @@ namespace Upgrader
                 FileInfo baseInfo = new FileInfo(basePath);
                 if (baseInfo.Exists == false)
                 {
-                    throw new UpgradeException("Base file '" + basePath + "' was not found.");
+                    throw new UpgradeException("Base file '" + basePath + "' was not found.", null);
                 }
 
                 FileInfo targetInfo = new FileInfo(targetPath);

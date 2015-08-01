@@ -41,10 +41,6 @@ namespace Upgrader
             return directory;
         }
 
-        //public static bool IsCurrentOlder(FileInfo currentInfo, FileInfo baseinfo)
-        //{
-        //    return currentInfo.LastWriteTime < baseinfo.LastWriteTime;
-        //}
 
         public static bool IsFileLocked(string filePath)
         {
@@ -74,24 +70,10 @@ namespace Upgrader
             return fileInfo.IsReadOnly;
         }
 
-        //public static void SetFileReadonly(FileInfo fileInfo)
-        //{
-        //    fileInfo.IsReadOnly = true;
-        //}
-
         public static void SetFileNotReadonly(FileInfo fileInfo)
         {
             fileInfo.IsReadOnly = false;
         }
-
-        //public static Process ExecuteCommand(string command, string arguments)
-        //{
-        //    ProcessStartInfo startInfo = new ProcessStartInfo(command);
-        //    startInfo.Arguments = arguments;
-        //    startInfo.UseShellExecute = true;
-        //    Process process = Process.Start(startInfo);
-        //    return process;
-        //}
 
         #endregion File Helpers
     }

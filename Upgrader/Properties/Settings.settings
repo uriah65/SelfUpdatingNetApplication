@@ -14,5 +14,8 @@
     <Setting Name="InstallationDirectory" Type="System.String" Scope="Application">
       <Value Profile="(Default)">C:\Temp\Upgrader_base_files\</Value>
     </Setting>
+    <Setting Name="AllowOffLine" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

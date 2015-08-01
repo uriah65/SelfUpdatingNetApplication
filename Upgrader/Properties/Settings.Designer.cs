@@ -58,5 +58,17 @@ namespace Upgrader.Properties {
                 return ((string)(this["InstallationDirectory"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AllowOffLine {
+            get {
+                return ((bool)(this["AllowOffLine"]));
+            }
+            set {
+                this["AllowOffLine"] = value;
+            }
+        }
     }
 }
