@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define SMALL_CASE_OFF
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -40,19 +41,28 @@ namespace Upgrader
 
         public void LaunchApplication(string[] args)
         {
-            Process process = new Process();
-            process.StartInfo.WorkingDirectory = Constants.ExecutionDirectory;
-            process.StartInfo.FileName = Constants.ExecutionDirectory + Constants.ApplicationExe;
-            process.StartInfo.Arguments = Constants.LAUNCHED_FROM_UPDATER; //todo: rest of args
-            process.Start();
+            //todo: pass args[]
+            Launch(Constants.ApplicationExe, Constants.LAUNCHED_FROM_UPDATER);
         }
 
         public void LaunchUpgrader(string[] args = null)
         {
+            //todo: pass args[]
+            Launch(Constants.UPGRADER_EXE_FILE, Constants.LAUNCHED_FROM_APP);
+        }
+
+        private void Launch(string file, string arguments)
+        {
+            file = Constants.ExecutionDirectory + file;
+            if (File.Exists(file))
+            {
+                throw new UpgradeException($"File {file} wasn't found.");
+            }
+
             Process process = new Process();
             process.StartInfo.WorkingDirectory = Constants.ExecutionDirectory;
-            process.StartInfo.FileName = Constants.ExecutionDirectory + Constants.UPGRADER_EXE_FILE;
-            process.StartInfo.Arguments = Constants.LAUNCHED_FROM_APP; //todo: rest of args
+            process.StartInfo.FileName = file;
+            process.StartInfo.Arguments = Constants.LAUNCHED_FROM_APP; //todo: pass args[]
             process.Start();
         }
 
@@ -63,7 +73,9 @@ namespace Upgrader
         public List<string> GetUpgraderFiles()
         {
             List<string> files = new List<string>() { Constants.UPGRADER_EXE_FILE, Constants.UPGRADER_CONFIGURATION_FILE };
+#if SMALL_CASE
             files = files.Select(e => e.ToLowerInvariant()).ToList();
+#endif
             return files;
         }
 
@@ -71,16 +83,20 @@ namespace Upgrader
         {
             DirectoryInfo dirInfo = new DirectoryInfo(Constants.DeploymentBaseDirectory);
             FileInfo[] fileInfos = dirInfo.GetFiles();
+#if SMALL_CASE
             List<string> files = fileInfos.Select(e => e.Name.ToLowerInvariant()).ToList();
+#else
+            List<string> files = fileInfos.Select(e => e.Name).ToList();
+#endif
 
             if (files == null)
             {
-                throw new UpgradeException("Base directory is empty.");
+                throw new UpgradeException($"Application installation directory '{Constants.DeploymentBaseDirectory}' is empty.");
             }
 
             if (exceptUpgrader)
             {
-                files = files.Except(GetUpgraderFiles()).ToList();
+                files = files.Except(GetUpgraderFiles(), StringComparer.OrdinalIgnoreCase).ToList();
             }
 
             return files;
@@ -143,8 +159,13 @@ namespace Upgrader
         private List<string> GetLocked(string path, List<string> files)
         {
             List<string> locked = new List<string>();
+#if SMALL_CASE
             List<string> executables = files.Where(e => e.ToLower().EndsWith(".exe")).ToList();
+#else
+            List<string> executables = files.Where(e => e.EndsWith(".exe")).ToList();
+#endif
             foreach (string file in executables)
+
             {
                 //string exePath = path + @"\" + file; //todo: check
                 string exePath = path + file;
@@ -201,6 +222,5 @@ namespace Upgrader
         }
 
         #endregion Operation Actions
-
     }
 }

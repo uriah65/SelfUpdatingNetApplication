@@ -2,6 +2,8 @@
 
 namespace Upgrader
 {
+    //todo: better msg if upgrader requires main app to start ...
+
     public class Program
     {
         internal static IUpdateOperations _operations = new Operations(); // to do as factory injection

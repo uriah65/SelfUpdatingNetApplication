@@ -13,10 +13,6 @@ namespace WpfApplication
     /// </summary>
     public partial class App : Application
     {
-        //todo: check if app.exe / upgrader.exe exist before launching ...
-        //todo: better msg if upgrader requires main app to start ...
-        //todo: changes file's case when copy
-
         protected override void OnStartup(StartupEventArgs e)
         {
             /* check if application update is required */            
