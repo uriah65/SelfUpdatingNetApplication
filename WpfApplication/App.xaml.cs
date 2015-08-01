@@ -15,6 +15,7 @@ namespace WpfApplication
     {
         //todo: check if app.exe / upgrader.exe exist before launching ...
         //todo: better msg if upgrader requires main app to start ...
+        //todo: changes file's case when copy
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -29,7 +30,7 @@ namespace WpfApplication
             }
             catch (Exception ex)
             {
-                string message = $"\nSorry, an error has occurred.\n";
+                string message = $"\nSorry, an error has occurred.\n{ex.Message}";
                 MessageBox.Show(message, "Upgrade exception", MessageBoxButton.OK, MessageBoxImage.Error);
                 Shutdown(0);
                 return;
