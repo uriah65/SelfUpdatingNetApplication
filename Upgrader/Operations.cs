@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace Upgrader
 {
@@ -104,13 +105,31 @@ namespace Upgrader
 
         private void CopyFilesWithCheck(List<string> files)
         {
-            List<string> locked = GetLocked(Constants.WorkingDirectory, files);
-            if (locked != null && locked.Count > 0)
+            /* 6 attempts allow to wait for 1+2++ ..+ 6 = 21 seconds. */
+            int attempts = 6;
+            int delay = 1000; 
+
+            bool hasLocked = false;
+            List<string> lockedFiles = null;
+
+            for (int i = 0; i < attempts; i++)
             {
-                string message = string.Format("Another version of the application is running.{0}{0}Locked files are: ", Environment.NewLine);
-                for (int i = 0; i < Math.Min(3, locked.Count); i++)
+                lockedFiles = GetLocked(Constants.WorkingDirectory, files);
+                hasLocked = lockedFiles != null && lockedFiles.Count > 0;
+                if (hasLocked == false)
                 {
-                    message += locked[i] + ", ";
+                    break;
+                }
+                Constants.Tracer.Trace($"Discovered {lockedFiles.Count()} locked files.");
+                Thread.Sleep(delay++);
+            }
+
+            if (hasLocked)
+            {
+                string message = string.Format("The following files are in use: ", Environment.NewLine);
+                for (int i = 0; i < Math.Min(3, lockedFiles.Count); i++)
+                {
+                    message += lockedFiles[i] + ", ";
                 }
 
                 throw new UpgradeException(message, null);
