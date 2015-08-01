@@ -61,6 +61,11 @@
       <Name>Upgrader</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ManualTests\DeployToBase.cmd" />
+    <None Include="ManualTests\DeployToExe.cmd" />
+    <None Include="ManualTests\Upgrader.exe.config" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
