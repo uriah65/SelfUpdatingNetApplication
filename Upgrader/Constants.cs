@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -16,43 +15,52 @@ namespace Upgrader
         public static readonly string MESSAGE_START_MAINAPP = $"{UPGRADER_EXE_FILE} is out of date, please start main application.";
         public static readonly string MESSAGE_CANNOT_COMPLETE_UPDATE = $"Cannot complete update of the main application. Please restart application.";
 
-
-        internal static string ExecutionDirectory { get; private set; }
+        internal static string WorkingDirectory { get; private set; }
         internal static string ApplicationExe { get; private set; }
-        internal static string DeploymentBaseDirectory { get; private set; }
-        internal static bool AllowOffline { get; private set; } = false; //todo in settings
+        internal static string InstallationDirectory { get; private set; }
+        internal static bool AllowOffline { get; private set; }
 
         internal static Tracer Tracer = new Tracer();
-
 
         public static void LoadConfiguration()
         {
             Tracer.Trace("LoadConfiguration started.");
-                       
-            ExecutionDirectory = Helpers.GetExecutionDirectory();
 
-            XElement xdoc = XElement.Load(ExecutionDirectory + UPGRADER_CONFIGURATION_FILE);
+            WorkingDirectory = Helpers.GetExecutionDirectory();
+
+            /* reading upgrader configuration file */
+            XElement xdoc = XElement.Load(WorkingDirectory + UPGRADER_CONFIGURATION_FILE);
             var els = xdoc.Descendants("setting");
 
+            /* get values */
             ApplicationExe = els.SingleOrDefault(e => e.Attribute("name").Value == "ApplicationExe")?.Value;
-            DeploymentBaseDirectory = els.SingleOrDefault(e => e.Attribute("name").Value == "DeploymentBaseDirectory")?.Value;
+            InstallationDirectory = els.SingleOrDefault(e => e.Attribute("name").Value == "InstallationDirectory")?.Value;
+            var allowOfflineStr = els.SingleOrDefault(e => e.Attribute("name").Value == "AllowOffLine")?.Value;
+            AllowOffline = string.Compare(allowOfflineStr, "true", true) == 0; //todo: test reading settings
 
+            /* verify values */
             if (string.IsNullOrWhiteSpace(ApplicationExe))
             {
-                throw new UpgradeException("Please specify 'ApplicationExe' setting in the configuration file.");
+                throw new UpgradeException("Please specify 'ApplicationExe' parameter in the Upgrader.exe.config file.");
             }
 
-            if (string.IsNullOrWhiteSpace(DeploymentBaseDirectory))
+            if (string.IsNullOrWhiteSpace(InstallationDirectory))
             {
-                throw new UpgradeException("Please specify 'DeploymentBaseDirectory' setting in the configuration file.");
+                throw new UpgradeException("Please specify 'InstallationDirectory' setting in the Upgrader.exe.config file.");
             }
 
-            if (Directory.Exists(DeploymentBaseDirectory) == false)
+            if (Directory.Exists(InstallationDirectory) == false)
             {
                 if (AllowOffline == false)
                 {
-                    throw new UpgradeException("Application deployment directory is unavailable.");
+                    throw new UpgradeException("InstallationDirectory directory isn't available.");
                 }
+            }
+
+            /* coerce */
+            if (InstallationDirectory.EndsWith(@"\") == false)
+            {
+                InstallationDirectory += @"\";
             }
 
             Tracer.Trace("LoadConfiguration finished.");

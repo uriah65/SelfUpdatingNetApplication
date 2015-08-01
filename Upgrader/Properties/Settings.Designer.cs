@@ -49,5 +49,14 @@ namespace Upgrader.Properties {
                 return ((string)(this["DeploymentBaseDirectory"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Temp\\Upgrader_base_files\\")]
+        public string InstallationDirectory {
+            get {
+                return ((string)(this["InstallationDirectory"]));
+            }
+        }
     }
 }

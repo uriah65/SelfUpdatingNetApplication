@@ -53,14 +53,14 @@ namespace Upgrader
 
         private void Launch(string file, string arguments)
         {
-            file = Constants.ExecutionDirectory + file;
-            if (File.Exists(file))
+            file = Constants.WorkingDirectory + file;
+            if (File.Exists(file) == false)
             {
                 throw new UpgradeException($"File {file} wasn't found.");
             }
 
             Process process = new Process();
-            process.StartInfo.WorkingDirectory = Constants.ExecutionDirectory;
+            process.StartInfo.WorkingDirectory = Constants.WorkingDirectory;
             process.StartInfo.FileName = file;
             process.StartInfo.Arguments = Constants.LAUNCHED_FROM_APP; //todo: pass args[]
             process.Start();
@@ -81,7 +81,7 @@ namespace Upgrader
 
         public List<string> GetApplicationFiles(bool exceptUpgrader)
         {
-            DirectoryInfo dirInfo = new DirectoryInfo(Constants.DeploymentBaseDirectory);
+            DirectoryInfo dirInfo = new DirectoryInfo(Constants.InstallationDirectory);
             FileInfo[] fileInfos = dirInfo.GetFiles();
 #if SMALL_CASE
             List<string> files = fileInfos.Select(e => e.Name.ToLowerInvariant()).ToList();
@@ -91,7 +91,7 @@ namespace Upgrader
 
             if (files == null)
             {
-                throw new UpgradeException($"Application installation directory '{Constants.DeploymentBaseDirectory}' is empty.");
+                throw new UpgradeException($"Application installation directory '{Constants.InstallationDirectory}' is empty.");
             }
 
             if (exceptUpgrader)
@@ -104,7 +104,7 @@ namespace Upgrader
 
         private void CopyFilesWithCheck(List<string> files)
         {
-            List<string> locked = GetLocked(Constants.ExecutionDirectory, files);
+            List<string> locked = GetLocked(Constants.WorkingDirectory, files);
             if (locked != null && locked.Count > 0)
             {
                 string message = string.Format("Another version of the application is running.{0}{0}Locked files are: ", Environment.NewLine);
@@ -116,21 +116,21 @@ namespace Upgrader
                 throw new UpgradeException(message);
             }
 
-            CopyNewerFiles(Constants.DeploymentBaseDirectory, Constants.ExecutionDirectory, files);
+            CopyNewerFiles(Constants.InstallationDirectory, Constants.WorkingDirectory, files);
         }
 
         private List<string> GetOlderFiles(List<string> files)
         {
             bool overWrite = false;
-            string baseDirectory = Constants.DeploymentBaseDirectory;
-            string targetDirectory = Constants.ExecutionDirectory;
+            string baseDirectory = Constants.InstallationDirectory;
+            string targetDirectory = Constants.WorkingDirectory;
 
             List<string> results = new List<string>();
 
             foreach (string file in files)
             {
-                string basePath = baseDirectory + @"\" + file;
-                string targetPath = targetDirectory + @"\" + file;
+                string basePath = baseDirectory + file;
+                string targetPath = targetDirectory + file;
                 FileInfo baseInfo = new FileInfo(basePath);
                 if (baseInfo.Exists == false)
                 {
@@ -204,14 +204,16 @@ namespace Upgrader
         {
             foreach (string file in files)
             {
-                string basePath = baseDirectory + @"\" + file;
-                string targetPath = targetDirectory + @"\" + file;
+                string basePath = baseDirectory + file;
+                string targetPath = targetDirectory + file;
 
                 FileInfo targetInfo = new FileInfo(targetPath);
                 if (targetInfo.Exists)
                 {
                     Helpers.CheckAndRemoveReadOnly(targetInfo);
                 }
+
+                Constants.Tracer.Trace($"Copying '{basePath}' to '{targetPath}' ");
 
                 File.Copy(basePath, targetPath, true);
 
