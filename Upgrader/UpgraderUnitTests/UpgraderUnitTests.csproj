@@ -62,6 +62,7 @@
     <Compile Include="T30_UpdateOperation.cs" />
     <Compile Include="T40_Controller_MainApp.cs" />
     <Compile Include="T41_Controller_Updater.cs" />
+    <Compile Include="T31_UpdateOperations_Human.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Upgrader.csproj">

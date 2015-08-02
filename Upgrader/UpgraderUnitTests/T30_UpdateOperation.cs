@@ -9,7 +9,7 @@ namespace UpgraderUnitTests
     public class T30_Main
     {
         private Pawns _pwans;
-        private UpdateOperations _action;
+        private UpdateOperations _operatiions;
 
         [TestInitialize()]
         public void Initialize()
@@ -22,7 +22,7 @@ namespace UpgraderUnitTests
             _pwans.EmptyDirectory(ConstantsUT.TestSourcePath);
             _pwans.EmptyDirectory(ConstantsUT.TestTargetPath);
 
-            _action = new UpdateOperations();// (ConstantsUT.TestSourcePath, ConstantsUT.TestTargetPath, null, null, false);
+            _operatiions = new UpdateOperations();// (ConstantsUT.TestSourcePath, ConstantsUT.TestTargetPath, null, null, false);
         }
 
         [TestCleanup()]
@@ -38,7 +38,7 @@ namespace UpgraderUnitTests
             _pwans.MoveToSource("an", "bn");
             _pwans.MoveToTarget("ao");
 
-            _action.CopyFilesWithCheck(files, ConstantsUT.TestSourcePath, ConstantsUT.TestTargetPath);
+            _operatiions.CopyFilesWithCheck(files, ConstantsUT.TestSourcePath, ConstantsUT.TestTargetPath);
 
             /* both files has been replaced*/
             Assert.AreEqual(true, _pwans.TargetIs("an", "bn"));
@@ -52,7 +52,7 @@ namespace UpgraderUnitTests
             List<string> files =
            _pwans.MoveToSource("an", "bn", "co", "dn", "eo");
 
-           _action.CopyFilesWithCheck(files, ConstantsUT.TestSourcePath, ConstantsUT.TestTargetPath);
+           _operatiions.CopyFilesWithCheck(files, ConstantsUT.TestSourcePath, ConstantsUT.TestTargetPath);
 
             /* verify results */
             Assert.AreEqual(true, _pwans.TargetIs("an", "bn", "co", "dn", "eo"));
@@ -67,7 +67,7 @@ namespace UpgraderUnitTests
             _pwans.MoveToSource("ao", "bn", "cn", "dn", "eo");
             _pwans.MoveToTarget("an", "bn", "co", "dn", "en");
 
-            _action.CopyFilesWithCheck(files, ConstantsUT.TestSourcePath, ConstantsUT.TestTargetPath);
+            _operatiions.CopyFilesWithCheck(files, ConstantsUT.TestSourcePath, ConstantsUT.TestTargetPath);
 
             /* no files has been changed on target */
             Assert.AreEqual(true, _pwans.TargetIs("an", "bn", "cn", "dn", "en"));
