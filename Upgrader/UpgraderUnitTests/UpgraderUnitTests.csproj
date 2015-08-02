@@ -50,6 +50,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="ConstantsUT.cs" />
     <Compile Include="FakeOperations.cs" />
     <Compile Include="Infrastructure\Pawn.cs" />
     <Compile Include="Infrastructure\Pawns.cs" />

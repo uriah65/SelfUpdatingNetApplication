@@ -1,13 +1,12 @@
-﻿using DeployerLib;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UpgraderUnitTests;
 
-
-namespace Tests.Infrastructure
+namespace UpgraderTests
 {
     class Pawns
     {
@@ -41,12 +40,12 @@ namespace Tests.Infrastructure
 
         public void MoveToSource(params string[] nicks)
         {
-            MoveTo(ConstantsPR.TestSourcePath, nicks);
+            MoveTo(ConstantsUT.TestSourcePath, nicks);
         }
 
         public void MoveToTarget(params string[] nicks)
         {
-            MoveTo(ConstantsPR.TestTargetPath, nicks);
+            MoveTo(ConstantsUT.TestTargetPath, nicks);
         }
 
         private void MoveTo(string path, params string[] nicks)
@@ -56,7 +55,7 @@ namespace Tests.Infrastructure
                 Pawn file = Find(nick);
                 string targetPath = path + @"\" + file.Name;
                 File.Copy(file.Path, targetPath);
-                FileHelpers.SetFileReadonly(new FileInfo(targetPath));
+                Upgrader.FileOperations.SetFileReadonly(new FileInfo(targetPath));
             }
         }
 
@@ -69,7 +68,7 @@ namespace Tests.Infrastructure
         {
             List<string> nicksList = nicks.ToList();
 
-            DirectoryInfo info = new DirectoryInfo(ConstantsPR.TestTargetPath);
+            DirectoryInfo info = new DirectoryInfo(ConstantsUT.TestTargetPath);
             FileInfo[] fileInfos = info.GetFiles();
 
             if (nicks.Count() != fileInfos.Length)
@@ -117,7 +116,7 @@ namespace Tests.Infrastructure
 
             foreach (FileInfo fileInfo in dirInfo.GetFiles())
             {
-                FileHelpers.CheckAndRemoveReadOnly(fileInfo);
+                Upgrader.FileOperations.CheckAndRemoveReadOnly(fileInfo);
                 fileInfo.Delete();
             }
 

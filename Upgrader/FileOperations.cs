@@ -71,6 +71,11 @@ namespace Upgrader
             return fileInfo.IsReadOnly;
         }
 
+        public static void SetFileReadonly(FileInfo fileInfo)
+        {
+            fileInfo.IsReadOnly = true;
+        }
+
         public static void SetFileNotReadonly(FileInfo fileInfo)
         {
             fileInfo.IsReadOnly = false;

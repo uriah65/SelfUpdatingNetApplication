@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Tests.Infrastructure
+namespace UpgraderTests
 {
     internal class Pawn
     {
