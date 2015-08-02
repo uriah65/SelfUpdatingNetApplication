@@ -81,6 +81,16 @@ namespace Upgrader
             fileInfo.IsReadOnly = false;
         }
 
+
+        public static Process ExecuteCommand(string command, string arguments)
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo(command);
+            startInfo.Arguments = arguments;
+            startInfo.UseShellExecute = true;
+            Process process = Process.Start(startInfo);
+            return process;
+        }
+
         #endregion File Helpers
     }
 }

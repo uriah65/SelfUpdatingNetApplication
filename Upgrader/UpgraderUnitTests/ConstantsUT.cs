@@ -8,7 +8,7 @@ namespace UpgraderUnitTests
 {
     public class ConstantsUT
     {
-        private const string _base = @"..\..\..\Upgrader.Tests\";
+        private const string _base = @"..\..\..\UpgraderUnitTests\";
 
         public const string SourceOldPath = _base + @"Infrastructure\SourceOld";
         public const string SourceNewPath = _base + @"Infrastructure\SourceNew";

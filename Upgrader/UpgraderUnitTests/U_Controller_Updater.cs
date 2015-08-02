@@ -28,7 +28,7 @@ namespace UpgraderTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(UpgradeException))]
+        [ExpectedException(typeof(UpgradeUpgraderException))]
         public void Controller_Updater_UpdaterUpdate()
         {
             /* updater requires update, exception generated. User should have started main application first. */
@@ -39,7 +39,7 @@ namespace UpgraderTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(UpgradeException))]
+        [ExpectedException(typeof(UpgradeUpgraderException))]
         public void Controller_Updater_UpdateBoth()
         {
             /* updater requires update, exception generated. User should have started main application first. */
