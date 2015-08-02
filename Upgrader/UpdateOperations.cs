@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace Upgrader
 {
-    public class Operations : IUpdateOperations
+    public class UpdateOperations : IUpdateOperations
     {
         #region IUpdateOperations
 
@@ -200,9 +200,9 @@ namespace Upgrader
                 try
                 {
                     /* read only can cause an exception if read-only file is locked at the same time */
-                    Helpers.CheckAndRemoveReadOnly(fileInfo);
+                    FileOperations.CheckAndRemoveReadOnly(fileInfo);
 
-                    isLocked = Helpers.IsFileLocked(exePath);
+                    isLocked = FileOperations.IsFileLocked(exePath);
                 }
                 catch
                 {
@@ -229,7 +229,7 @@ namespace Upgrader
                 FileInfo targetInfo = new FileInfo(targetPath);
                 if (targetInfo.Exists)
                 {
-                    Helpers.CheckAndRemoveReadOnly(targetInfo);
+                    FileOperations.CheckAndRemoveReadOnly(targetInfo);
                 }
 
                 Constants.Tracer.Trace($"Copying '{basePath}' to '{targetPath}' ");
@@ -238,7 +238,7 @@ namespace Upgrader
 
                 /* remove read only, if source was read only */
                 targetInfo = new FileInfo(targetPath);
-                Helpers.CheckAndRemoveReadOnly(targetInfo);
+                FileOperations.CheckAndRemoveReadOnly(targetInfo);
             }
         }
 

@@ -1,0 +1,14 @@
+// test manifest with overwrite
+##overwrite
+              a.txt
+  b.txt 
+
+                   //
+				   d.txt
+
+// images
+//c.txt this file was commented for the test purposes 
+  e.txt
+
+  f.exe
+  DeployerLib.dll

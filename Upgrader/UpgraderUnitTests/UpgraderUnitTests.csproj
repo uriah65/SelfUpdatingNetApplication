@@ -51,6 +51,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="FakeOperations.cs" />
+    <Compile Include="Infrastructure\Pawn.cs" />
+    <Compile Include="Infrastructure\Pawns.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="U_Controller_MainApp.cs" />
     <Compile Include="U_Controller_Updater.cs" />
@@ -62,9 +64,34 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Infrastructure\FileLocking\Test.bat" />
+    <None Include="Infrastructure\SourceNew\m1.manifest" />
+    <None Include="Infrastructure\SourceNew\m2.manifest" />
+    <None Include="Infrastructure\SourceNew\m3.manifest" />
     <None Include="ManualTests\DeployToBase.cmd" />
     <None Include="ManualTests\DeployToExe.cmd" />
     <None Include="ManualTests\Upgrader.exe.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Infrastructure\SourceNew\a.txt" />
+    <Content Include="Infrastructure\SourceNew\b.txt" />
+    <Content Include="Infrastructure\SourceNew\c.txt" />
+    <Content Include="Infrastructure\SourceNew\d.txt" />
+    <Content Include="Infrastructure\SourceNew\DeployerLib.dll" />
+    <Content Include="Infrastructure\SourceNew\e.txt" />
+    <Content Include="Infrastructure\SourceNew\f.exe" />
+    <Content Include="Infrastructure\SourceNew\_stop.txt" />
+    <Content Include="Infrastructure\SourceOld\a.txt" />
+    <Content Include="Infrastructure\SourceOld\b.txt" />
+    <Content Include="Infrastructure\SourceOld\c.txt" />
+    <Content Include="Infrastructure\SourceOld\d.txt" />
+    <Content Include="Infrastructure\SourceOld\e.txt" />
+    <Content Include="Infrastructure\SourceOld\f.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TestGround\Manual_Test\" />
+    <Folder Include="TestGround\TestBase\" />
+    <Folder Include="TestGround\TestTarget\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

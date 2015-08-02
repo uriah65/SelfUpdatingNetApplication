@@ -43,6 +43,12 @@
     <Compile Include="..\Upgrader\Constants.cs">
       <Link>Constants.cs</Link>
     </Compile>
+    <Compile Include="..\Upgrader\Exceptions.cs">
+      <Link>Exceptions.cs</Link>
+    </Compile>
+    <Compile Include="..\Upgrader\FileOperations.cs">
+      <Link>FileOperations.cs</Link>
+    </Compile>
     <Compile Include="..\Upgrader\IUpdateOperations.cs">
       <Link>IUpdateOperations.cs</Link>
     </Compile>
@@ -52,10 +58,10 @@
     <Compile Include="..\Upgrader\Tracer.cs">
       <Link>Tracer.cs</Link>
     </Compile>
-    <Compile Include="Exceptions.cs" />
-    <Compile Include="FileOperations.cs" />
+    <Compile Include="..\Upgrader\UpdateOperations.cs">
+      <Link>UpdateOperations.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UpdateOperations.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

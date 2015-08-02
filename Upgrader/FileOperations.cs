@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Upgrader
 {
-    public static class Helpers
+    public static class FileOperations
     {
         #region Arguments
 
