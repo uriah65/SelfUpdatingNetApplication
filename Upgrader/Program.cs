@@ -4,7 +4,7 @@ namespace Upgrader
 {
     public class Program
     {
-        internal static IUpdateOperations _operations = new Operations(); // to do as factory injection
+        internal static IUpdateOperations _operations = new UpdateOperations(); // to do as factory injection
 
         private static void Main()
         {
@@ -86,7 +86,7 @@ namespace Upgrader
             Constants.Tracer.Trace("IsApplicationRestart_Inner started.");
 
             bool restart = false;
-            bool wasLunchedByUpdater = Helpers.HasArg(args, Constants.LAUNCHED_FROM_UPDATER);
+            bool wasLunchedByUpdater = FileOperations.HasArg(args, Constants.LAUNCHED_FROM_UPDATER);
 
             if (_operations.IsUpgraderUpdateRequired())
             {

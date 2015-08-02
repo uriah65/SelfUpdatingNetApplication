@@ -26,7 +26,7 @@ namespace Upgrader
         {
             Tracer.Trace("LoadConfiguration started.");
 
-            WorkingDirectory = Helpers.GetExecutionDirectory();
+            WorkingDirectory = FileOperations.GetExecutionDirectory();
 
             /* reading upgrader configuration file */
             XElement xdoc = XElement.Load(WorkingDirectory + UPGRADER_CONFIGURATION_FILE);

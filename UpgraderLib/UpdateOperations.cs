@@ -105,7 +105,7 @@ namespace Upgrader
 
         private void CopyFilesWithCheck(List<string> files)
         {
-            /* 6 attempts allow to wait for 1+2++ ..+ 6 = 21 seconds. */
+            /* 6 attempts allow to wait for 1+2++ ..+ 6 = 21 seconds for all attempts. */
             int attempts = 6;
             int delay = 1000; 
 

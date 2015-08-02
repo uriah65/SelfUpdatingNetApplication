@@ -13,6 +13,7 @@ namespace Upgrader
     {
         #region Arguments
 
+        //todo: remove from here...
         public static bool HasArg(string[] args, string pattern)
         {
             if (args == null)
