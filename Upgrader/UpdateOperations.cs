@@ -1,4 +1,5 @@
 ﻿#define SMALL_CASE_OFF
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -29,15 +30,15 @@ namespace Upgrader
         public void UpdateApplication(bool exceptUpgrader)
         {
             List<string> files = GetApplicationFiles(exceptUpgrader);
-            files = GetOlderFiles(files);
-            CopyFilesWithCheck(files);
+            files = GetOlderFiles(files); //todo: remove it is deeper now
+            CopyFilesWithCheck(files, Constants.InstallationDirectory, Constants.WorkingDirectory);
         }
 
         public void UpgradeUpdater()
         {
             List<string> files = GetUpgraderFiles();
-            files = GetOlderFiles(files);
-            CopyFilesWithCheck(files);
+            files = GetOlderFiles(files); //todo: remove it is deeper now
+            CopyFilesWithCheck(files, Constants.InstallationDirectory, Constants.WorkingDirectory);
         }
 
         public void LaunchApplication(string[] args)
@@ -103,11 +104,16 @@ namespace Upgrader
             return files;
         }
 
-        private void CopyFilesWithCheck(List<string> files)
+        internal void CopyFilesWithCheck(List<string> files, string sourceDirectory, string destinationDirectory)
         {
+
+            sourceDirectory = sourceDirectory.EnsureSlash();
+            destinationDirectory = destinationDirectory.EnsureSlash();
+
+
             /* 6 attempts allow to wait for 1+2++ ..+ 6 = 21 seconds for all attempts. */
             int attempts = 6;
-            int delay = 1000; 
+            int delay = 1000;
 
             bool hasLocked = false;
             List<string> lockedFiles = null;
@@ -135,7 +141,7 @@ namespace Upgrader
                 throw new UpgradeException(message, null);
             }
 
-            CopyNewerFiles(Constants.InstallationDirectory, Constants.WorkingDirectory, files);
+            CopyNewerFiles(sourceDirectory, destinationDirectory, files);
         }
 
         private List<string> GetOlderFiles(List<string> files)
@@ -184,9 +190,7 @@ namespace Upgrader
             List<string> executables = files.Where(e => e.EndsWith(".exe")).ToList();
 #endif
             foreach (string file in executables)
-
             {
-                //string exePath = path + @"\" + file; //todo: check
                 string exePath = path + file;
                 FileInfo fileInfo = new FileInfo(exePath);
                 if (fileInfo.Exists == false)
@@ -226,19 +230,25 @@ namespace Upgrader
                 string basePath = baseDirectory + file;
                 string targetPath = targetDirectory + file;
 
+                bool hasNew = true;
                 FileInfo targetInfo = new FileInfo(targetPath);
                 if (targetInfo.Exists)
                 {
                     FileOperations.CheckAndRemoveReadOnly(targetInfo);
+                    FileInfo sourceInfo = new FileInfo(basePath);
+                    hasNew = sourceInfo.LastWriteTime > targetInfo.LastWriteTime;
                 }
 
-                Constants.Tracer.Trace($"Copying '{basePath}' to '{targetPath}' ");
+                if (hasNew)
+                {
+                    Constants.Tracer.Trace($"Copying '{basePath}' to '{targetPath}' ");
 
-                File.Copy(basePath, targetPath, true);
+                    File.Copy(basePath, targetPath, true);
 
-                /* remove read only, if source was read only */
-                targetInfo = new FileInfo(targetPath);
-                FileOperations.CheckAndRemoveReadOnly(targetInfo);
+                    /* get new Info remove read only, if source was read only */
+                    targetInfo = new FileInfo(targetPath);
+                    FileOperations.CheckAndRemoveReadOnly(targetInfo);
+                }
             }
         }
 

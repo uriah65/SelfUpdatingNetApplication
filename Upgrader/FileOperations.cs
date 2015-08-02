@@ -38,10 +38,18 @@ namespace Upgrader
         public static string GetExecutionDirectory()
         {
             string directory = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            directory = Path.GetDirectoryName(directory) + @"\";
+            directory = Path.GetDirectoryName(directory).EnsureSlash();
             return directory;
         }
 
+        public static string EnsureSlash(this string path)
+        {
+            if (path.EndsWith(@"\") == false)
+            {
+                path += @"\";
+            }
+            return path;
+        }
 
         public static bool IsFileLocked(string filePath)
         {

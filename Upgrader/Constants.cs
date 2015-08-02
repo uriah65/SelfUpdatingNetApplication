@@ -12,7 +12,7 @@ namespace Upgrader
         public static string UPGRADER_EXE_FILE = "Upgrader.exe";
         public static string UPGRADER_CONFIGURATION_FILE = UPGRADER_EXE_FILE + ".config";
 
-        //public static readonly string MESSAGE_START_MAINAPP = $"{UPGRADER_EXE_FILE} is out of date, please start main application.";
+        //public static read-only string MESSAGE_START_MAINAPP = $"{UPGRADER_EXE_FILE} is out of date, please start main application.";
         public static readonly string MESSAGE_CANNOT_COMPLETE_UPDATE = $"Cannot complete update of the main application. Please restart application.";
 
         internal static string WorkingDirectory { get; private set; }
@@ -58,10 +58,7 @@ namespace Upgrader
             }
 
             /* coerce */
-            if (InstallationDirectory.EndsWith(@"\") == false)
-            {
-                InstallationDirectory += @"\";
-            }
+            InstallationDirectory = InstallationDirectory.EnsureSlash();
 
             Tracer.Trace("LoadConfiguration finished.");
         }

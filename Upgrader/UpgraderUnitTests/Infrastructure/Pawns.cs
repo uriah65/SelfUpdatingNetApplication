@@ -38,25 +38,28 @@ namespace UpgraderTests
 
         #region MoveTo
 
-        public void MoveToSource(params string[] nicks)
+        public List<string> MoveToSource(params string[] nicks)
         {
-            MoveTo(ConstantsUT.TestSourcePath, nicks);
+            return MoveTo(ConstantsUT.TestSourcePath, nicks);
         }
 
-        public void MoveToTarget(params string[] nicks)
+        public List<string> MoveToTarget(params string[] nicks)
         {
-            MoveTo(ConstantsUT.TestTargetPath, nicks);
+            return MoveTo(ConstantsUT.TestTargetPath, nicks);
         }
 
-        private void MoveTo(string path, params string[] nicks)
+        private List<string> MoveTo(string path, params string[] nicks)
         {
+            List<string> files = new List<string>();
             foreach (string nick in nicks)
             {
-                Pawn file = Find(nick);
-                string targetPath = path + @"\" + file.Name;
-                File.Copy(file.Path, targetPath);
+                Pawn pawn = Find(nick);
+                files.Add(pawn.Name);
+                string targetPath = path + @"\" + pawn.Name;
+                File.Copy(pawn.Path, targetPath);
                 Upgrader.FileOperations.SetFileReadonly(new FileInfo(targetPath));
             }
+            return files;
         }
 
         #endregion MoveTo
