@@ -10,7 +10,7 @@ namespace UpgraderTests
     /// Summary description for U_Controller_MainApp
     /// </summary>
     [TestClass]
-    public class U_Controller_MainApp
+    public class T40_Controller_MainApp
     {
         private string[] UPDATER_ARGS = new string[] { Upgrader.Constants.LAUNCHED_FROM_UPDATER };
     

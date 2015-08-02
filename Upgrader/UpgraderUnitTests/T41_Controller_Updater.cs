@@ -5,7 +5,7 @@ using Upgrader;
 namespace UpgraderTests
 {
     [TestClass]
-    public class U_Controller_Updater
+    public class T41_Controller_Updater
     {
         [TestMethod]
         public void Controller_Updater_HappyPath()

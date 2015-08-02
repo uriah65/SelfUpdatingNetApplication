@@ -59,8 +59,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="T20_FileOperations.cs" />
     <Compile Include="T10_TestingInfrastructure.cs" />
-    <Compile Include="U_Controller_MainApp.cs" />
-    <Compile Include="U_Controller_Updater.cs" />
+    <Compile Include="T30_UpdateOperation.cs" />
+    <Compile Include="T40_Controller_MainApp.cs" />
+    <Compile Include="T41_Controller_Updater.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Upgrader.csproj">
