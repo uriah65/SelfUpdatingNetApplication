@@ -16,28 +16,27 @@ namespace Upgrader
         public bool IsApplicationUpdateRequired(bool exceptUpgrader)
         {
             List<string> files = GetApplicationFiles(exceptUpgrader);
-            files = GetOlderFiles(files);
+            files = GetOlderOrMissing(files, Constants.InstallationDirectory, Constants.WorkingDirectory);
+
             return files.Any();
         }
 
         public bool IsUpgraderUpdateRequired()
         {
             List<string> files = GetUpgraderFiles();
-            files = GetOlderFiles(files);
+            files = GetOlderOrMissing(files, Constants.InstallationDirectory, Constants.WorkingDirectory);
             return files.Any();
         }
 
         public void UpdateApplication(bool exceptUpgrader)
         {
             List<string> files = GetApplicationFiles(exceptUpgrader);
-            files = GetOlderFiles(files); //todo: remove it is deeper now
             CopyFilesWithCheck(files, Constants.InstallationDirectory, Constants.WorkingDirectory);
         }
 
         public void UpgradeUpdater()
         {
             List<string> files = GetUpgraderFiles();
-            files = GetOlderFiles(files); //todo: remove it is deeper now
             CopyFilesWithCheck(files, Constants.InstallationDirectory, Constants.WorkingDirectory);
         }
 
@@ -75,9 +74,6 @@ namespace Upgrader
         public List<string> GetUpgraderFiles()
         {
             List<string> files = new List<string>() { Constants.UPGRADER_EXE_FILE, Constants.UPGRADER_CONFIGURATION_FILE };
-#if SMALL_CASE
-            files = files.Select(e => e.ToLowerInvariant()).ToList();
-#endif
             return files;
         }
 
@@ -85,11 +81,7 @@ namespace Upgrader
         {
             DirectoryInfo dirInfo = new DirectoryInfo(Constants.InstallationDirectory);
             FileInfo[] fileInfos = dirInfo.GetFiles();
-#if SMALL_CASE
-            List<string> files = fileInfos.Select(e => e.Name.ToLowerInvariant()).ToList();
-#else
             List<string> files = fileInfos.Select(e => e.Name).ToList();
-#endif
 
             if (files == null)
             {
@@ -104,13 +96,27 @@ namespace Upgrader
             return files;
         }
 
-        internal void CopyFilesWithCheck(List<string> files, string sourceDirectory, string destinationDirectory)
+        internal void CopyFilesWithCheck(List<string> files, string from, string to)
         {
+            from = from.EnsureSlash();
+            to = to.EnsureSlash();
 
-            sourceDirectory = sourceDirectory.EnsureSlash();
-            destinationDirectory = destinationDirectory.EnsureSlash();
+            /* filter out only old files */
+            files = GetOlderOrMissing(files, from, to);
+            if (files.Any() == false)
+            {
+                return;
+            }
 
+            /* make sure that files to be overwritten are not locked */
+            AssetNotLocked(files, to);
 
+            /* actually copy */
+            ReplaceOlderFiles(files, from, to);
+        }
+
+        private void AssetNotLocked(List<string> files, string folder)
+        {
             /* 6 attempts allow to wait for 1+2++ ..+ 6 = 21 seconds for all attempts. */
             int attempts = 6;
             int delay = 1000;
@@ -120,7 +126,7 @@ namespace Upgrader
 
             for (int i = 0; i < attempts; i++)
             {
-                lockedFiles = GetLocked(Constants.WorkingDirectory, files);
+                lockedFiles = GetLocked(files, folder);
                 hasLocked = lockedFiles != null && lockedFiles.Count > 0;
                 if (hasLocked == false)
                 {
@@ -140,29 +146,25 @@ namespace Upgrader
 
                 throw new UpgradeException(message, null);
             }
-
-            CopyNewerFiles(sourceDirectory, destinationDirectory, files);
         }
 
-        private List<string> GetOlderFiles(List<string> files)
+        private List<string> GetOlderOrMissing(List<string> files, string from, string to)
         {
             bool overWrite = false;
-            string baseDirectory = Constants.InstallationDirectory;
-            string targetDirectory = Constants.WorkingDirectory;
 
             List<string> results = new List<string>();
 
             foreach (string file in files)
             {
-                string basePath = baseDirectory + file;
-                string targetPath = targetDirectory + file;
-                FileInfo baseInfo = new FileInfo(basePath);
-                if (baseInfo.Exists == false)
+                string sourceFile = from + file;
+                string targetFile = to + file;
+                FileInfo sourceInfo = new FileInfo(sourceFile);
+                if (sourceInfo.Exists == false)
                 {
-                    throw new UpgradeException("Base file '" + basePath + "' was not found.", null);
+                    throw new UpgradeException("Source file '" + sourceFile + "' was not found.", null);
                 }
 
-                FileInfo targetInfo = new FileInfo(targetPath);
+                FileInfo targetInfo = new FileInfo(targetFile);
                 if (targetInfo.Exists == false)
                 {
                     /* file is missing in target */
@@ -170,7 +172,7 @@ namespace Upgrader
                 }
                 else
                 {
-                    if (overWrite || baseInfo.LastWriteTime > targetInfo.LastWriteTime)
+                    if (overWrite || sourceInfo.LastWriteTime > targetInfo.LastWriteTime)
                     {
                         /* base contains newer file */
                         results.Add(file);
@@ -181,71 +183,66 @@ namespace Upgrader
             return results;
         }
 
-        private List<string> GetLocked(string path, List<string> files)
+        private List<string> GetLocked(List<string> files, string folder)
         {
             List<string> locked = new List<string>();
-#if SMALL_CASE
-            List<string> executables = files.Where(e => e.ToLower().EndsWith(".exe")).ToList();
-#else
-            List<string> executables = files.Where(e => e.EndsWith(".exe")).ToList();
-#endif
-            foreach (string file in executables)
+
+            foreach (string file in files)
             {
-                string exePath = path + file;
-                FileInfo fileInfo = new FileInfo(exePath);
-                if (fileInfo.Exists == false)
+                string fullPath = folder + file;
+                FileInfo fileInfo = new FileInfo(fullPath);
+                if (fileInfo.Exists)
                 {
-                    /* we might be looking for locked files, but they not yet has been copied to the target directory.
-                       such 'non-existing' files considered not to be locked. */
-                    continue;
-                }
+                    bool isLocked = false;
+                    try
+                    {
+                        /* we must remove read only flag, because file will cause an exception if read-only file as if it is locked  */
+                        FileOperations.CheckAndRemoveReadOnly(fileInfo);
+                        isLocked = FileOperations.IsFileLocked(fullPath);
+                    }
+                    catch
+                    {
+                        isLocked = true;
+                    }
 
-                bool isLocked = false;
-                try
-                {
-                    /* read only can cause an exception if read-only file is locked at the same time */
-                    FileOperations.CheckAndRemoveReadOnly(fileInfo);
-
-                    isLocked = FileOperations.IsFileLocked(exePath);
-                }
-                catch
-                {
-                    isLocked = true;
-                }
-
-                if (isLocked)
-                {
-                    /* add file to locked collection */
-                    locked.Add(file);
+                    if (isLocked)
+                    {
+                        /* add file to locked collection */
+                        locked.Add(file);
+                    }
                 }
             }
 
             return locked;
         }
 
-        private void CopyNewerFiles(string baseDirectory, string targetDirectory, List<string> files)
+        private void ReplaceOlderFiles(List<string> files, string from, string to)
         {
             foreach (string file in files)
             {
-                string basePath = baseDirectory + file;
-                string targetPath = targetDirectory + file;
+                string basePath = from + file;
+                string targetPath = to + file;
 
-                bool hasNew = true;
+                bool toReplace = true;
                 FileInfo targetInfo = new FileInfo(targetPath);
                 if (targetInfo.Exists)
                 {
-                    FileOperations.CheckAndRemoveReadOnly(targetInfo);
                     FileInfo sourceInfo = new FileInfo(basePath);
-                    hasNew = sourceInfo.LastWriteTime > targetInfo.LastWriteTime;
+                    toReplace = sourceInfo.LastWriteTime > targetInfo.LastWriteTime;
+                    if (toReplace)
+                    {
+                        FileOperations.CheckAndRemoveReadOnly(targetInfo);
+                    }
                 }
 
-                if (hasNew)
+                if (toReplace)
                 {
                     Constants.Tracer.Trace($"Copying '{basePath}' to '{targetPath}' ");
 
+                    /* actual file copy */
                     File.Copy(basePath, targetPath, true);
 
-                    /* get new Info remove read only, if source was read only */
+                    /* get new Info and remove read only, if source was read only */
                     targetInfo = new FileInfo(targetPath);
                     FileOperations.CheckAndRemoveReadOnly(targetInfo);
                 }
@@ -255,3 +252,43 @@ namespace Upgrader
         #endregion Operation Actions
     }
 }
+
+//private List<string> GetLocked(string folderPath, List<string> files)
+//{
+//    List<string> locked = new List<string>();
+//    //List<string> executables =  files.Where(e => e.EndsWith(".exe")).ToList();
+//    List<string> executables =  files;
+
+//    foreach (string file in executables)
+//    {
+//        string exePath = folderPath + file;
+//        FileInfo fileInfo = new FileInfo(exePath);
+//        if (fileInfo.Exists == false)
+//        {
+//            /* we might be looking for locked files, but they not yet has been copied to the target directory.
+//               such 'non-existing' files considered not to be locked. */
+//            continue;
+//        }
+
+//        bool isLocked = false;
+//        try
+//        {
+//            /* read only can cause an exception if read-only file is locked at the same time */
+//            FileOperations.CheckAndRemoveReadOnly(fileInfo);
+
+//            isLocked = FileOperations.IsFileLocked(exePath);
+//        }
+//        catch
+//        {
+//            isLocked = true;
+//        }
+
+//        if (isLocked)
+//        {
+//            /* add file to locked collection */
+//            locked.Add(file);
+//        }
+//    }
+
+//    return locked;
+//}
